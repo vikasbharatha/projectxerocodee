@@ -1,0 +1,25 @@
+- hosts: all
+  become: true
+
+  tasks:
+    - name: Install dependencies
+      apt:
+        name: npm
+        state: present
+
+    - name: Clone KubeMonitor repository
+      git:
+        repo: https://github.com/vikasbharatha/projectxerocodee.git
+        dest: /opt/KubeMonitor
+
+    - name: Install KubeMonitor dependencies and start the app
+      command: >
+        npm install
+        npm run build
+        npm run start
+      args:
+        chdir: /opt/KubeMonitor
+
+    - name: Port-forward Prometheus to 9090
+      command: >
+        kubectl port-forward -n <namespace> svc/<service name> 9090
